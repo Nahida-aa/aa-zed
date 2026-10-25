@@ -1,0 +1,16 @@
+{
+  "telemetry": { "diagnostics": false, "metrics": false },
+  "language_models": {
+    "openai_compatible": {
+      "stub": {
+        "api_url": "http://127.0.0.1:8765/v1",
+        "available_models": [
+          { "name": "stub-model", "display_name": "Stub Model", "max_tokens": 8192 }
+        ]
+      }
+    }
+  },
+  "agent": {
+    "default_model": { "provider": "stub", "model": "stub-model" }
+  }
+}

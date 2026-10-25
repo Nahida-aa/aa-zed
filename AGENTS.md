@@ -220,6 +220,7 @@ bun tools/gh-releases.ts zed-industries/zed --limit 15     # 按时间倒序列�
 | `skills/`                    | 自定义 skill 定义（ast-grep / cargo / gpui-test / outline）                                                              |
 | `toolcell.md`                | 各家 agent 工具对照（opencode / codex / zed / claude code），目前多为待填                                                |
 | `issues/`                    | 单个问题/PR 记录：上游 zed issue（`pr-*` / `review-*` / `pr-issue-*`）与自研问题（`YYYY-MM-DD-*`，如工具调用流截断排查） |
+| `fake-provider/`             | Bun 写的 OpenAI 兼容假端点，复现流式 tool call 缺 id/name（zed #65655），`mode` 文件切换正常/异常响应 |
 
 > 新增 `.agents/` 下的文档时，回来更新这张表，避免内容变成孤儿。
 
