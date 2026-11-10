@@ -19,3 +19,4 @@ __pycache__/
 .cursor/rules/skill-context.md
 .windsurf/rules/skill-context.md
 .claude/commands/
+exports/
