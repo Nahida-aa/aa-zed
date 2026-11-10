@@ -475,7 +475,7 @@ impl TerminalBuilder {
         };
         cx.background_spawn(fut)
     }
-
+    /// 把消费端接上，开始按序排空积压
     pub fn subscribe(mut self, cx: &Context<Terminal>) -> Terminal {
         //Event loop
         self.terminal.event_loop_task = cx.spawn(async move |terminal, cx| {

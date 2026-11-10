@@ -15,18 +15,29 @@ use crate::{
 use alacritty_terminal::vte::ansi::Rgb;
 use gpui::{Pixels, Point as GpuiPoint};
 
-///Upward flowing events, for changing the title and such
+///Upward flowing events, for changing the title and such \
+/// Terminal 报给 视图 的事件 \
+/// `Terminal` 不持有视图句柄，不能直接改 UI； \
+/// 它唯一能做的就是把"发生了什么" `cx.emit` 出去 \
+/// 。视图层在 `packages/terminal_view/src/view/events.rs:22` \
+/// 用 `cx.subscribe_in(terminal, ...)` **一处**订阅全部，按变体分支
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Event {
-    TitleChanged,
-    BreadcrumbsChanged,
-    OutputReplaced,
+    TitleChanged,       // shell 改窗口标题（OSC 0/2）
+    BreadcrumbsChanged, // 面包屑目录变了
+    OutputReplaced,     // ACP 远程会话**权威替换**整屏输出
     CloseTerminal,
+    // 程序响铃
     Bell,
+    // **"屏幕脏了，请重画"**——最高频核心
     Wakeup,
+    // 光标闪烁开关态
     BlinkChanged(bool),
+    // 文本选中发生/变化/清除
     SelectionsChanged,
+    // 当前鼠标悬停的链接：`Some` 有链接、`None` 清除
     NewNavigationTarget(Option<MaybeNavigationTarget>),
+    // 用户**点了**链接
     Open(MaybeNavigationTarget),
 }
 
@@ -49,6 +60,17 @@ pub enum MaybeNavigationTarget {
     PathLike(PathLikeTarget),
 }
 
+// 视图输入回调（input/ 各模块：键盘、鼠标、滚轮、选中、vi 按键…）
+//    │  只做一件事：入队意图，不立即执行
+//    │  self.events.push_back(InternalEvent::SetSelection(...))
+//    ▼
+// Terminal.events : VecDeque<InternalEvent>      （pty/mod.rs 的字段，主线程队列）
+//    │
+//    ▼  视图每次重绘前的 pre-paint 统一排空
+// Terminal::sync()（grid/content/content.rs:175）
+//    │  while let Some(e) = self.events.pop_front() { process_internal_event(e) }
+//    ▼
+// 真正执行（锁 term、滚 grid、发剪贴板、查链接……）
 #[derive(Clone)]
 pub enum InternalEvent {
     Resize(TerminalBounds),
